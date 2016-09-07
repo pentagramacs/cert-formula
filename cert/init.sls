@@ -13,6 +13,8 @@ cert_packages:
 # Deploy certificates
 # Place all files in a files_roots/cert, e.g. /srv/salt/files/cert/
 
+{% set run_ca_update = False  %}
+
 {% for name, data in salt['pillar.get']('cert:certlist', {}).items() %}
 
   {% set key = data.get('key', False) %}
@@ -24,11 +26,14 @@ cert_packages:
   {% set key_mode = data.get('key_mode', map.key_mode) %}
   {% set cert_dir = data.get('cert_dir', map.cert_dir) %}
   {% set key_dir = data.get('key_dir', map.key_dir) %}
+  {% set local_key_dir = data.get('local_cert_dir', 'cert') %}
+  {% set is_ca = data.get('is_ca', False) %}
 
+  {% if is_ca %}{% run_ca_update = True %}{% endif %}
 
 {{ cert_dir }}/{{ name }}:
   file.managed:
-    - source: salt://cert/{{ name }}
+    - source: salt://{{ local_key_dir }}/{{ name }}
     - user: {{ cert_user }}  
     - group: {{ cert_group }}  
     - mode: {{ cert_mode }}  
@@ -44,3 +49,9 @@ cert_packages:
   {% endif %}
 
 {% endfor %}
+
+{% if run_ca_update %}
+cert_ensure_update_update-ca-certificates:
+  cmd.run:
+    - name: update-ca-certificates
+{% endif %}
