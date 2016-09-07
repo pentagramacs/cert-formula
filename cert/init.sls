@@ -29,7 +29,9 @@ cert_packages:
   {% set local_key_dir = data.get('local_cert_dir', 'cert') %}
   {% set is_ca = data.get('is_ca', False) %}
 
-  {% if is_ca %}{% run_ca_update = True %}{% endif %}
+  {% if is_ca %}
+    {% run_ca_update = True %}
+  {% endif %}
 
 {{ cert_dir }}/{{ name }}:
   file.managed:
