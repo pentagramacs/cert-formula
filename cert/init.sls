@@ -30,7 +30,7 @@ cert_packages:
   {% set is_ca = data.get('is_ca', False) %}
 
   {% if is_ca %}
-    {% run_ca_update = True %}
+    {% set run_ca_update = True %}
   {% endif %}
 
 {{ cert_dir }}/{{ name }}:
